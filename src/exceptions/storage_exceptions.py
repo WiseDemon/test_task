@@ -27,3 +27,15 @@ class StoragePatternError(StorageException):
         else:
             msg = 'Wrong pattern: ' + msg
         super().__init__(msg)
+
+
+class StorageFileError(StorageException):
+    """
+    When loading or saving keys from file goes wrong
+    """
+    def __init__(self, msg):
+        if msg is None:
+            msg = 'Storage file error'
+        else:
+            msg = 'Storage file error: ' + msg
+        super().__init__(msg)

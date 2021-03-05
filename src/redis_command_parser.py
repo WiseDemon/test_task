@@ -24,7 +24,12 @@ class RedisCommandParser:
             set None to disable saving/loading
         """
         if storage is None:
-            storage = Storage(gc=gc,file_prefix=file_prefix)
+            try:
+                storage = Storage(gc=gc,file_prefix=file_prefix)
+            except StorageFileError as err:
+                print(err)
+                print("Key saving disabled")
+                storage = Storage(gc=gc,file_prefix=None)
         self.storage = storage
         self.astonished = False
 

@@ -151,13 +151,13 @@ class Storage(object):
             try:
                 with open(self.file_prefix + '_keys.pkl', 'wb') as f:
                     pickle.dump(self._keys_dict, f, pickle.HIGHEST_PROTOCOL)
-            except (OSError, pickle.PickleError):
-                pass
+            except (OSError, pickle.PickleError) as err:
+                raise StorageFileError("can't save keys")
             try:
                 with open(self.file_prefix + '_moes.pkl', 'wb') as f:
                     pickle.dump(self._moe_dict, f, pickle.HIGHEST_PROTOCOL)
-            except (OSError, pickle.PickleError):
-                pass
+            except (OSError, pickle.PickleError) as err:
+                raise StorageFileError("can't save keys' moes")
 
     def load(self):
         """
@@ -165,17 +165,34 @@ class Storage(object):
         :return:
         """
         if self.file_prefix:
+            file_path = self.file_prefix + '_keys.pkl'
             try:
-                with open(self.file_prefix + '_keys.pkl', 'rb') as f:
+                with open(file_path, 'rb') as f:
                     self._keys_dict = pickle.load(f)
-            except (OSError, pickle.UnpicklingError):
+            # if no file was found, create empty dicts
+            except FileNotFoundError:
                 self._keys_dict = {}
-
-            try:
-                with open(self.file_prefix + '_moes.pkl', 'rb') as f:
-                    self._moe_dict = pickle.load(f)
-            except (OSError, pickle.UnpicklingError):
                 self._moe_dict = {}
+            # if file is not accessible, raise an exception
+            except IOError:
+                raise StorageFileError(f"can't read {file_path}")
+            except pickle.UnpicklingError:
+                raise StorageFileError(f"can't unpickle {file_path}")
+            # if keys were loaded, load moes
+            else:
+                file_path = self.file_prefix + '_moes.pkl'
+                try:
+                    with open(self.file_prefix + '_moes.pkl', 'rb') as f:
+                        self._moe_dict = pickle.load(f)
+                # both files must be present
+                except FileNotFoundError:
+                    raise StorageFileError(f"can't load moes, {file_path} does not exist")
+                except IOError:
+                    raise StorageFileError(f"can't read {file_path}")
+                except pickle.UnpicklingError:
+                    raise StorageFileError(f"can't unpickle {file_path} file")
+                for key in self._moe_dict:
+                    raise StorageFileError(f"found moe for a key {key} that does not exist")
 
 
 class StorageGarbageCollector:
