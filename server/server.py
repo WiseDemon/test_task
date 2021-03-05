@@ -2,6 +2,7 @@ import sys, getopt, socket, select
 from signal import signal, SIGINT, SIGTERM
 from twisted.internet import reactor
 from src.server_protocol import ServerProtocolFactory
+from src.exceptions.storage_exceptions import StorageFileError
 
 
 help_msg =\
@@ -40,9 +41,14 @@ if __name__ == '__main__':
     # CTRL+C handling
     def sigint_handler(signal_recieved, frame):
         listening_port.stopListening()
-        factory.parser.storage.save()
+        try:
+            factory.parser.storage.save()
+        except StorageFileError as err:
+            print(err)
+            print('Keys are not saved')
         reactor.stop()
         print('Bye')
+
     signal(SIGINT, sigint_handler)
     signal(SIGTERM, sigint_handler)
     print('Server is up')
