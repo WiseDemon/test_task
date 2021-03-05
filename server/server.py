@@ -1,4 +1,4 @@
-import sys, getopt, socket, select
+import sys, getopt
 from signal import signal, SIGINT, SIGTERM
 from twisted.internet import reactor
 from src.server_protocol import ServerProtocolFactory
