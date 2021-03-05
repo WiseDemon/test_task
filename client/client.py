@@ -1,7 +1,6 @@
-import sys, getopt, socket, time
+import sys, getopt
 from twisted.internet import reactor
-from twisted.internet.endpoints import TCP4ClientEndpoint, connectProtocol
-from src.client_protocol import ClientProtocolFactory, ClientProtocol
+from src.client_protocol import ClientProtocolFactory
 
 
 help_msg =\
@@ -34,15 +33,3 @@ if __name__ == '__main__':
     reactor.connectTCP(host, port, ClientProtocolFactory())
     print(f"Connected to {host}:{port}")
     reactor.run()
-    # print(f'Connecting to {host}:{port}')
-    # with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-    #     client_socket.connect((host,port))
-    #     command = input('>')
-    #     command += '\r\n'
-    #     print(command.encode('utf-8'))
-    #     client_socket.sendall(command.encode('utf-8'))
-    #     print("Waiting for answer")
-    #     (data,_,_,_) = client_socket.recvmsg(1024)
-    #     print(data.decode('utf-8'))
-    #     client_socket.shutdown(socket.SHUT_WR)
-    #     client_socket.close()
