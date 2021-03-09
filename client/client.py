@@ -27,7 +27,7 @@ if __name__ == '__main__':
             print(help_msg)
             sys.exit()
         if opt == '--port':
-            port = arg
+            port = int(arg)
         if opt == '--host':
             host = arg
     reactor.connectTCP(host, port, ClientProtocolFactory())
