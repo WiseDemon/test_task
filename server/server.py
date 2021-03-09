@@ -29,7 +29,7 @@ if __name__ == '__main__':
             print(help_msg)
             sys.exit()
         if opt == '--port':
-            port = arg
+            port = int(arg)
             print("Port is now", port)
         if opt == '--save':
             save_dest = arg + '/'
