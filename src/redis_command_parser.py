@@ -16,7 +16,7 @@ class RedisCommandParser:
     """
     Class for parsing Redis commands
     """
-    def __init__(self, storage=None, gc=False, file_prefix=None):
+    def __init__(self, storage=None):
         """
         :param storage: Storage object or None for creating it automatically
         :param gc: enable garbage collector in createt Storage
@@ -24,12 +24,8 @@ class RedisCommandParser:
             set None to disable saving/loading
         """
         if storage is None:
-            try:
-                storage = Storage(gc=gc,file_prefix=file_prefix)
-            except StorageFileError as err:
-                print(err)
-                print("Key saving disabled")
-                storage = Storage(gc=gc,file_prefix=None)
+            storage = Storage()
+
         self.storage = storage
         self.astonished = False
 

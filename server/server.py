@@ -1,8 +1,12 @@
 import sys, getopt
 from signal import signal, SIGINT, SIGTERM
+
 from twisted.internet import reactor
+
 from src.server_protocol import ServerProtocolFactory
 from src.exceptions.storage_exceptions import StorageFileError
+from src.storage import Storage
+from src.redis_command_parser import RedisCommandParser
 
 
 help_msg =\
@@ -18,8 +22,10 @@ if __name__ == '__main__':
     print('Server starting...')
     port = 6379
     save_dest = './'
+
+    # Reading options
     try:
-        opts, args = getopt.getopt(sys.argv[1:],'h',['port=','save=', 'help'])
+        opts, args = getopt.getopt(sys.argv[1:], 'h', ['port=', 'save=', 'help'])
     except getopt.GetoptError as err:
         print('Usage: server [-h] [--port p] [--save dest]')
         sys.exit(err.msg)
@@ -35,7 +41,17 @@ if __name__ == '__main__':
             save_dest = arg + '/'
             print('Saving to', save_dest)
 
-    factory = ServerProtocolFactory(gc=True,file_prefix=save_dest+'storage')
+    # Creating storage
+    try:
+        storage = Storage(gc=True, file_prefix=save_dest+'storage')
+    except StorageFileError as err:
+        print(f"Error using save destination '{save_dest}': \n", str(err))
+        print("Starting without disk saving/loading feature.")
+        storage = Storage(gc=True)
+
+    command_parser = RedisCommandParser(storage=storage)
+    factory = ServerProtocolFactory(parser=command_parser)
+
     listening_port = reactor.listenTCP(port, factory)
 
     # CTRL+C handling

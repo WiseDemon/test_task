@@ -54,7 +54,7 @@ class ServerProtocol(RedisProtocol):
 class ServerProtocolFactory(ServerFactory):
     protocol = ServerProtocol
 
-    def __init__(self, parser=None, gc=False, file_prefix=None):
+    def __init__(self, parser=None):
         """
         :param parser: RedisCommandParser object or None, to create it automatically
         :param gc: enable garbage collector in the created parser
@@ -63,7 +63,7 @@ class ServerProtocolFactory(ServerFactory):
         """
         self.proto_count = 0
         if parser is None:
-            parser = RedisCommandParser(gc=gc,file_prefix=file_prefix)
+            parser = RedisCommandParser()
         self.parser = parser
 
     def buildProtocol(self, addr):
